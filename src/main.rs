@@ -38,9 +38,13 @@ fn main() {
         strength: args.strength,
     };
 
+    println!("##### Démarrage de la partie #####");
+    let mut i = 1;
+
     loop {
+        println!("## Manche {} ##", i);
         // Tour du joueur 1
-        println!("\nAu tour de {} (Vitalité={}, Vitesse={}, Force={})",
+        println!("Au tour de {} (Vitalité={}, Vitesse={}, Force={})",
             p1.name, p1.vitality, p1.speed, p1.strength);
 
         let objectifs_p1: Vec<u32> = (0..args.objectifs)
@@ -74,5 +78,8 @@ fn main() {
             println!("{} a perdu ! Partie terminée.", p2.name);
             break;
         }
+
+        println!("# Fin du tour #");
+        i += 1;
     }
 }

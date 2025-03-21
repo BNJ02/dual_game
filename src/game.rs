@@ -21,12 +21,11 @@ pub fn play_turn(player: &Player, objectifs: &[u32]) -> i32 {
                 if rx.try_recv().is_ok() {
                     return (counter, miss);
                 }
-                print!("\r→ Objectif {} : Miss = {} | Compteur = {}", objectif, miss, counter);
+                print!("\r{:width$}\r→ Objectif {} : Miss = {} | Compteur = {}", "", objectif, miss, counter, width = 50);
                 std::io::Write::flush(&mut std::io::stdout()).unwrap();
 
-                counter += 1;
-                if counter > 100 {
-                    counter = 0;
+                counter = (counter + 1) % 100;
+                if counter == 0 {
                     miss += 1;
                 }
                 thread::sleep(Duration::from_millis(speed));
