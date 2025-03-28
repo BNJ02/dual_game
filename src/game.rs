@@ -114,14 +114,21 @@ impl Game {
         Ok(())
     }
 
-    /// Lit une option numérique saisie par l’utilisateur.
+    /// Lit une option numérique saisie par l’utilisateur (1 ou 2 uniquement).
     fn get_choice(&self) -> Result<u32, Box<dyn Error>> {
-        print!("> ");
-        stdout().flush()?;
-        let mut input = String::new();
-        stdin().read_line(&mut input)?;
-        let choice: u32 = input.trim().parse()?;
-        Ok(choice)
+        loop {
+            print!("> ");
+            stdout().flush()?;
+            let mut input = String::new();
+            stdin().read_line(&mut input)?;
+            let trimmed = input.trim();
+            if let Ok(choice) = trimmed.parse::<u32>() {
+                if choice == 1 || choice == 2 {
+                    return Ok(choice);
+                }
+            }
+            println!("Entrée invalide, veuillez entrer 1 ou 2.");
+        }
     }
 
     /// Exécute le tour d’un joueur en traitant chacun des objectifs.

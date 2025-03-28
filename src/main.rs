@@ -41,14 +41,16 @@ fn main() -> Result<(), Box<dyn Error>> {
         game.run()?;
 
         println!("Relancer une partie ? [Y/N]");
-        print!("> ");
-        stdout().flush()?;
-        let mut input = String::new();
-        stdin().read_line(&mut input)?;
-        if !input.trim().eq_ignore_ascii_case("y") {
-            break;
+        loop {
+            print!("> ");
+            stdout().flush()?;
+            let mut input = String::new();
+            stdin().read_line(&mut input)?;
+            match input.trim().to_uppercase().as_str() {
+                "Y" => break,
+                "N" => return Ok(()),
+                _ => println!("Entrée invalide, veuillez entrer Y ou N."),
+            }
         }
     }
-
-    Ok(())
 }

@@ -65,14 +65,6 @@ impl Counter {
         println!(); // Passage à la ligne après la fin du comptage.
         (final_counter, final_miss)
     }
-
-    /// Ancienne implémentation simplifiée qui retournait une valeur calculée à partir de la vitesse.
-    /// La méthode `simulate()` est conservée pour compatibilité mais n'est plus utilisée.
-    pub fn simulate(&self) -> (u32, u32) {
-        let simulated_value = (self.speed * 2) % 101;
-        let miss = if simulated_value >= 100 { 1 } else { 0 };
-        (simulated_value, miss)
-    }
 }
 
 #[cfg(test)]
@@ -90,7 +82,7 @@ mod tests {
     #[test]
     fn test_counter_simulate() {
         let counter = Counter::new(50);
-        let (value, miss) = counter.simulate();
+        let (value, miss) = counter.run(50); // Provide a valid objectif value
         assert!(value <= 100);
         assert!(miss <= 1);
     }
