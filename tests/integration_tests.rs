@@ -1,4 +1,4 @@
-use duel_game::utils::calculate_score;
+use dual_game::utils::calculate_score;
 
 #[test]
 fn test_calculate_score() {

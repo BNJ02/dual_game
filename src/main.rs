@@ -1,85 +1,54 @@
-use clap::Parser;
-use duel_game::game::play_turn;
-use duel_game::player::Player;
+use std::error::Error;
+use std::io::{stdin, stdout, Write};
 
-/// Arguments pour initialiser les joueurs.
+use clap::Parser;
+use dual_game::game::Game;
+use dual_game::player::Player;
+
+/// Structure gérant les arguments en ligne de commande.
 #[derive(Parser)]
+#[command(author, version, about, long_about = None)]
 struct Args {
-    #[clap(long, default_value = "Michel")]
+    /// Nom du premier joueur
+    #[arg(long)]
     name1: String,
-    #[clap(long, default_value = "Jacque")]
+    /// Nom du deuxième joueur
+    #[arg(long)]
     name2: String,
-    #[clap(long, default_value_t = 50)]
-    vitality: i32,
-    #[clap(long, default_value_t = 50)]
-    speed: u64,
-    #[clap(long, default_value_t = 50)]
-    strength: i32,
-    #[clap(long, default_value_t = 5)]
+    /// Vitalité initiale des joueurs (défaut: 50)
+    #[arg(long, default_value_t = 50)]
+    vitality: u32,
+    /// Nombre d’objectifs par tour (défaut: 5)
+    #[arg(long, default_value_t = 5)]
     objectifs: usize,
 }
 
-
-fn main() {
+/// Point d’entrée de l’application.
+fn main() -> Result<(), Box<dyn Error>> {
+    // Initialisation du logger (log, env_logger)
     env_logger::init();
+
+    // Parse des arguments en ligne de commande.
     let args = Args::parse();
 
-    let mut p1 = Player {
-        name: args.name1,
-        vitality: args.vitality,
-        speed: args.speed,
-        strength: args.strength,
-    };
+    // Création des joueurs. Par défaut, on attribue 50 à la vitalité, à la vitesse et à la force.
+    let player1 = Player::new(args.name1, args.vitality, 50, 50);
+    let player2 = Player::new(args.name2, args.vitality, 50, 50);
 
-    let mut p2 = Player {
-        name: args.name2,
-        vitality: args.vitality,
-        speed: args.speed,
-        strength: args.strength,
-    };
-
-    println!("##### Démarrage de la partie #####");
-    let mut i = 1;
-
+    // Boucle principale pour jouer plusieurs parties.
     loop {
-        println!("## Manche {} ##", i);
-        // Tour du joueur 1
-        println!("Au tour de {} (Vitalité={}, Vitesse={}, Force={})",
-            p1.name, p1.vitality, p1.speed, p1.strength);
+        let mut game = Game::new(vec![player1.clone(), player2.clone()], args.objectifs);
+        game.run()?;
 
-        let objectifs_p1: Vec<u32> = (0..args.objectifs)
-            .map(|_| rand::random::<u32>() % 101)
-            .collect();
-
-        let score_p1 = play_turn(&p1, &objectifs_p1);
-        println!("→ Score moyen : {}", score_p1);
-
-        p1.vitality -= (score_p1 - p1.strength).abs();
-
-        if p1.vitality <= 0 {
-            println!("{} a perdu ! Partie terminée.", p1.name);
+        println!("Relancer une partie ? [Y/N]");
+        print!("> ");
+        stdout().flush()?;
+        let mut input = String::new();
+        stdin().read_line(&mut input)?;
+        if !input.trim().eq_ignore_ascii_case("y") {
             break;
         }
-
-        // Tour du joueur 2
-        println!("\nAu tour de {} (Vitalité={}, Vitesse={}, Force={})",
-            p2.name, p2.vitality, p2.speed, p2.strength);
-
-        let objectifs_p2: Vec<u32> = (0..args.objectifs)
-            .map(|_| rand::random::<u32>() % 101)
-            .collect();
-
-        let score_p2 = play_turn(&p2, &objectifs_p2);
-        println!("→ Score moyen : {}", score_p2);
-
-        p2.vitality -= (score_p2 - p2.strength).abs();
-
-        if p2.vitality <= 0 {
-            println!("{} a perdu ! Partie terminée.", p2.name);
-            break;
-        }
-
-        println!("# Fin du tour #");
-        i += 1;
     }
+
+    Ok(())
 }
