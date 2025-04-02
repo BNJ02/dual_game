@@ -1,11 +1,11 @@
 use std::error::Error;
-use std::io::{stdin, stdout, Write};
+use std::io::{Write, stdin, stdout};
 
-use crate::objectives::Objectives;
 use crate::counter::Counter;
+use crate::objectives::Objectives;
 use crate::player::Player;
+use crate::poison::{PoisonType, apply_poison};
 use crate::scoring::ScoringCalculator;
-use crate::poison::{apply_poison, PoisonType};
 
 /// Structure représentant une partie de jeu.
 #[derive(Clone, Debug)]
@@ -31,14 +31,20 @@ impl Game {
 
         // Boucle tant qu'aucun joueur n'a perdu toute sa vitalité.
         while self.players.iter().all(|p| p.vitality > 0) {
-            println!("## Manche {} ##", self.round);
+            println!("\n## Manche {} ##", self.round);
 
             // Chaque joueur joue son tour.
             let mut scores = Vec::new();
             for i in 0..self.players.len() {
+                if i > 0 {
+                    println!();
+                }
                 println!(
                     "Au tour de {} (Vitality={}, Speed={}, Strength={})",
-                    self.players[i].name, self.players[i].vitality, self.players[i].speed, self.players[i].strength
+                    self.players[i].name,
+                    self.players[i].vitality,
+                    self.players[i].speed,
+                    self.players[i].strength
                 );
 
                 // Génération des objectifs
@@ -49,6 +55,7 @@ impl Game {
 
                 // Exécution du tour et récupération du score moyen.
                 let (score, _) = self.play_turn(&objectives, &self.players[i])?;
+                println!("\n# Fin du tour #");
                 println!("→ Score moyen: {}", score);
                 scores.push(score);
             }
@@ -60,7 +67,7 @@ impl Game {
 
             // Traitement en cas d'égalité de scores
             if scores[0] == scores[1] {
-                println!("Égalité de scores, aucune pénalité.");
+                println!("\nÉgalité de scores, aucune pénalité.");
                 self.round += 1;
                 continue;
             }
@@ -73,12 +80,11 @@ impl Game {
 
             let diff = scores[winner_index].saturating_sub(scores[loser_index]);
             println!(
-                "{} gagne la manche. {} perd {} points de vitalité.",
-                self.players[winner_index].name,
-                self.players[loser_index].name,
-                diff
+                "\n{} gagne la manche. {} perd {} points de vitalité.",
+                self.players[winner_index].name, self.players[loser_index].name, diff
             );
-            self.players[loser_index].vitality = self.players[loser_index].vitality.saturating_sub(diff);
+            self.players[loser_index].vitality =
+                self.players[loser_index].vitality.saturating_sub(diff);
 
             // Le joueur gagnant choisit quel poison appliquer.
             println!(
@@ -103,7 +109,7 @@ impl Game {
             self.round += 1;
         }
 
-        println!("##### Partie terminée #####");
+        println!("\n##### Partie terminée #####");
         Ok(())
     }
 
@@ -133,22 +139,23 @@ impl Game {
 
     /// Exécute le tour d’un joueur en traitant chacun des objectifs.
     /// Retourne le score moyen obtenu et la liste des scores détaillés.
-    pub fn play_turn(&self, objectives: &Vec<u32>, player: &Player) -> Result<(u32, Vec<u32>), Box<dyn Error>> {
+    pub fn play_turn(
+        &self,
+        objectives: &Vec<u32>,
+        player: &Player,
+    ) -> Result<(u32, Vec<u32>), Box<dyn Error>> {
         let mut scores = Vec::new();
 
         // Pour chaque objectif, on simule l'arrêt d'un compteur.
-        for (i, obj) in objectives.iter().enumerate() {
-            println!("→ Objectif {} : {}", i + 1, obj);
-            println!("Appuyez sur ENTREE pour arrêter le compteur");
-            self.wait_enter()?;
-
+        for (_i, obj) in objectives.iter().enumerate() {
             // Instanciation d'un compteur utilisant la vitesse du joueur.
             let counter = Counter::new(player.speed);
             // Simulation du comportement du compteur (dans une implémentation réelle, un thread mettrait à jour la valeur)
             let (counter_value, miss) = counter.run(obj.clone());
 
-            let score = ScoringCalculator::calculate_score(*obj, counter_value, miss, player.strength);
-            println!("⟹ Counter value = {}, Miss = {} => Score = {}", counter_value, miss, score);
+            let score =
+                ScoringCalculator::calculate_score(*obj, counter_value, miss, player.strength);
+            // println!("⟹ Counter value = {}, Miss = {} => Score = {}", counter_value, miss, score);
             scores.push(score);
         }
         let average = ScoringCalculator::calculate_average(&scores);

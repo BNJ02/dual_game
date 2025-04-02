@@ -62,7 +62,7 @@ impl Counter {
         tx.send(()).unwrap();
 
         let (final_counter, final_miss) = handle.join().unwrap();
-        println!(); // Passage à la ligne après la fin du comptage.
+        // println!(); // Passage à la ligne après la fin du comptage.
         (final_counter, final_miss)
     }
 }

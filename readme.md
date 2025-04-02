@@ -1,4 +1,5 @@
 # Projet : Jeu de duel
+
 Ce projet est un jeu en ligne de commande développé en Rust où des joueurs s'affrontent tour par tour dans une série de manches. Chaque joueur dispose de caractéristiques (vitalité, vitesse, force) qui évoluent au fil des manches. Le candidat doit arrêter un compteur en appuyant sur la touche **Entrée** pour se rapprocher le plus possible d'objectifs aléatoires générés. Le score est alors calculé selon la différence entre le nombre ciblé et le résultat obtenu, et des actions (poisons sur vitesse ou force) impactent les caractéristiques pour les manches suivantes.
 
 ---
@@ -45,7 +46,7 @@ La partie se termine lorsqu'un joueur n'a plus de vitalité.
 - **Poison** : Le joueur gagnant peut infliger une pénalité au perdant (réduction de 5 points en vitesse ou en force).
 - **Modes de jeu étendus** : Possibilité d'ajouter plus de deux joueurs.
 - **Variante bonus** :
-    - Utilisation d'une HashMap pour représenter les objectifs, associant chaque lettre du clavier à une valeur cible. Un appui sur la mauvaise touche entraine un score de 0 pour l’objectif.
+  - Utilisation d'une HashMap pour représenter les objectifs, associant chaque lettre du clavier à une valeur cible. Un appui sur la mauvaise touche entraine un score de 0 pour l’objectif.
 - **Logging et gestion d'erreurs** : Utilisation de crates tels que `log`, `env_logger` pour logger différents niveaux de messages, et gestion systématique des erreurs avec `Result<T>`.
 
 ---
@@ -103,11 +104,6 @@ classDiagram
                 <<enumeration>>
                 + Speed
                 + Strength
-        }
-
-        %% Exemple d'une classe utilitaire pour le logging
-        class Logger {
-                + log(level: LogLevel, message: String) : void
         }
 
         %% Associations et dépendances entre classes
