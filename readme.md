@@ -9,6 +9,7 @@ Ce projet est un jeu en ligne de commande développé en Rust où des joueurs s'
 - [Présentation](#présentation)
 - [Fonctionnalités](#fonctionnalités)
 - [Architecture et Design](#architecture-et-design)
+- [Documentation avec Cargo](#documentation-avec-cargo)
 - [Installation et Exécution](#installation-et-exécution)
 - [Tests et Conformité](#tests-et-conformité)
 - [Dépendances et Crates Utilisés](#dépendances-et-crates-utilisés)
@@ -122,6 +123,41 @@ Les principales interactions sont les suivantes :
 - **Objectives** génère les objectifs pour chaque tour (sous forme de liste ou de HashMap pour la variante bonus).
 - **ScoringCalculator** effectue le calcul du score pour chaque objectif et la moyenne générale pour le tour.
 - **PoisonType** permet de choisir l'effet négatif appliqué au joueur perdant.
+
+---
+
+## Documentation avec Cargo
+
+Pour ouvrir la documentation générée par ce projet Rust, vous pouvez utiliser la commande suivante :
+
+```bash
+cargo doc --open
+```
+
+#### Explication
+
+- **`cargo doc`** : Cette commande génère la documentation pour votre projet Rust et ses dépendances en utilisant les commentaires de documentation présents dans le code.
+- **`--open`** : Une fois la documentation générée, cette option ouvre automatiquement la documentation dans votre navigateur par défaut.
+
+#### Note pour les utilisateurs de WSL
+
+Si vous travaillez sous Windows Subsystem for Linux (WSL), l'option `--open` peut ne pas fonctionner correctement si un navigateur n'est pas configuré pour s'ouvrir depuis WSL. Pour résoudre ce problème, vous devez installer **wslu**, un ensemble d'outils pour améliorer l'intégration entre WSL et Windows.
+
+##### Étapes pour installer wslu
+
+1. Mettez à jour vos paquets
+
+```bash
+sudo apt update
+```
+
+2. Installez wslu
+
+```bash
+sudo apt install wslu
+```
+
+Une fois installé, la commande `cargo doc --open` devrait ouvrir la documentation dans votre navigateur Windows par défaut.
 
 ---
 

@@ -1,3 +1,8 @@
+//! Module définissant la logique de la partie de jeu.
+//!
+//! Ce module contient la structure [`Game`] qui gère les tours de jeu, le calcul des scores et l'application
+//! des effets de poison entre les joueurs.
+
 use std::error::Error;
 use std::io::{Write, stdin, stdout};
 
@@ -10,13 +15,34 @@ use crate::scoring::ScoringCalculator;
 /// Structure représentant une partie de jeu.
 #[derive(Clone, Debug)]
 pub struct Game {
+    /// Liste des joueurs participant à la partie.
     pub players: Vec<Player>,
+    /// Nombre d’objectifs par tour.
     pub objectifs_count: usize,
+    /// Numéro du tour courant.
     pub round: u32,
 }
 
 impl Game {
-    /// Crée une nouvelle partie avec la liste de joueurs et le nombre d’objectifs.
+    /// Crée une nouvelle partie avec la liste de joueurs et le nombre d’objectifs par tour.
+    ///
+    /// # Arguments
+    ///
+    /// * `players` - Un vecteur contenant les joueurs.
+    /// * `objectifs_count` - Le nombre d’objectifs à générer pour chaque tour.
+    ///
+    /// # Exemples
+    ///
+    /// ```
+    /// use dual_game::game::Game;
+    /// use dual_game::player::Player;
+    ///
+    /// let players = vec![
+    ///     Player::new(String::from("Alice"), 50, 50, 50),
+    ///     Player::new(String::from("Bob"), 50, 50, 50),
+    /// ];
+    /// let game = Game::new(players, 5);
+    /// ```
     pub fn new(players: Vec<Player>, objectifs_count: usize) -> Self {
         Game {
             players,
@@ -25,7 +51,18 @@ impl Game {
         }
     }
 
-    /// Exécute la boucle de partie tant que les joueurs ont de la vitalité.
+    /// Exécute la boucle de la partie tant que tous les joueurs ont encore de la vitalité.
+    ///
+    /// Chaque tour se compose des actions suivantes :
+    /// - Affichage du numéro de tour.
+    /// - Chaque joueur joue son tour, ce qui inclut la génération d'objectifs et l'exécution d'un tour de jeu.
+    /// - Les scores sont comparés pour déterminer le gagnant du tour.
+    /// - Le joueur perdant subit une pénalité de vitalité.
+    /// - Le gagnant choisit un effet de poison à appliquer au perdant.
+    ///
+    /// # Retour
+    ///
+    /// Retourne `Ok(())` si la partie s'est terminée normalement ou une erreur dans le cas contraire.
     pub fn run(&mut self) -> Result<(), Box<dyn Error>> {
         println!("##### Démarrage de la partie #####");
 
@@ -47,7 +84,7 @@ impl Game {
                     self.players[i].strength
                 );
 
-                // Génération des objectifs
+                // Génération des objectifs.
                 let objectives = Objectives::generate(self.objectifs_count);
                 println!("→ Objectifs : {:?}", objectives);
                 println!("→ Appuyer sur ENTREE pour démarrer le tour..");
@@ -60,18 +97,19 @@ impl Game {
                 scores.push(score);
             }
 
-            // Comparaison des scores entre les deux joueurs.
+            // Comparaison des scores entre les joueurs.
             if scores.len() < 2 {
                 return Err("Nombre de joueurs insuffisant pour déterminer un vainqueur.".into());
             }
 
-            // Traitement en cas d'égalité de scores
+            // Traitement en cas d'égalité de scores.
             if scores[0] == scores[1] {
                 println!("\nÉgalité de scores, aucune pénalité.");
                 self.round += 1;
                 continue;
             }
 
+            // Détermination du gagnant et du perdant.
             let (winner_index, loser_index) = if scores[0] > scores[1] {
                 (0, 1)
             } else {
@@ -113,14 +151,26 @@ impl Game {
         Ok(())
     }
 
-    /// Lit une ligne depuis l’entrée standard (attend l’appui sur ENTREE).
+    /// Attend que l'utilisateur appuie sur ENTREE.
+    ///
+    /// Cette méthode lit une ligne depuis l'entrée standard et permet de faire une pause dans le déroulement du tour.
+    ///
+    /// # Retour
+    ///
+    /// Retourne `Ok(())` si la lecture s'est déroulée sans problème.
     fn wait_enter(&self) -> Result<(), Box<dyn Error>> {
         let mut input = String::new();
         stdin().read_line(&mut input)?;
         Ok(())
     }
 
-    /// Lit une option numérique saisie par l’utilisateur (1 ou 2 uniquement).
+    /// Lit et valide le choix numérique de l'utilisateur.
+    ///
+    /// Cette méthode demande à l'utilisateur de saisir 1 ou 2 et continue de redemander en cas d'entrée invalide.
+    ///
+    /// # Retour
+    ///
+    /// Retourne le choix de l'utilisateur sous forme de `u32`.
     fn get_choice(&self) -> Result<u32, Box<dyn Error>> {
         loop {
             print!("> ");
@@ -138,7 +188,21 @@ impl Game {
     }
 
     /// Exécute le tour d’un joueur en traitant chacun des objectifs.
-    /// Retourne le score moyen obtenu et la liste des scores détaillés.
+    ///
+    /// Pour chaque objectif, un compteur est lancé et la méthode [`Counter::run`] est appelée pour simuler
+    /// le comportement du compteur. Le score est ensuite calculé en fonction de la valeur du compteur,
+    /// du nombre de "miss" et de la force du joueur.
+    ///
+    /// # Arguments
+    ///
+    /// * `objectives` - Une référence vers un vecteur d'objectifs numériques.
+    /// * `player` - Le joueur dont le tour est en cours.
+    ///
+    /// # Retour
+    ///
+    /// Retourne un tuple `(score_moyen, scores_détaillés)` :
+    /// - `score_moyen` est le score moyen obtenu lors du tour.
+    /// - `scores_détaillés` est un vecteur contenant les scores de chaque objectif.
     pub fn play_turn(
         &self,
         objectives: &Vec<u32>,
@@ -150,7 +214,7 @@ impl Game {
         for (_i, obj) in objectives.iter().enumerate() {
             // Instanciation d'un compteur utilisant la vitesse du joueur.
             let counter = Counter::new(player.speed);
-            // Simulation du comportement du compteur (dans une implémentation réelle, un thread mettrait à jour la valeur)
+            // Simulation du comportement du compteur.
             let (counter_value, miss) = counter.run(obj.clone());
 
             let score =
@@ -168,6 +232,7 @@ mod tests {
     use super::*;
     use crate::player::Player;
 
+    /// Vérifie que la création d'une nouvelle partie avec deux joueurs et un nombre d'objectifs donné fonctionne.
     #[test]
     fn test_game_new() {
         let players = vec![

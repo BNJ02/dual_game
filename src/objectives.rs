@@ -1,17 +1,55 @@
+//! Module pour la génération d’objectifs.
+//!
+//! Ce module fournit des fonctions permettant de générer des objectifs sous forme de vecteurs ou de maps.
+//! Ces objectifs sont utilisés pour définir des cibles aléatoires dans le jeu.
+
 use rand::Rng;
 use std::collections::HashMap;
 
-/// Module pour la génération d’objectifs.
+/// Structure regroupant les fonctions de génération d’objectifs.
 pub struct Objectives;
 
 impl Objectives {
-    /// Génère un vecteur d'objectifs aléatoires entre 0 et 100.
+    /// Génère un vecteur d'objectifs aléatoires.
+    ///
+    /// Chaque objectif est une valeur numérique comprise entre 0 et 100.
+    ///
+    /// # Arguments
+    ///
+    /// * `n` - Le nombre d'objectifs à générer.
+    ///
+    /// # Retour
+    ///
+    /// Retourne un vecteur de `u32` contenant les objectifs générés.
+    ///
+    /// # Exemples
+    ///
+    /// ```
+    /// use dual_game::objectives::Objectives;
+    ///
+    /// let objs = Objectives::generate(5);
+    /// assert_eq!(objs.len(), 5);
+    /// ```
     pub fn generate(n: usize) -> Vec<u32> {
         let mut rng = rand::rng();
         (0..n).map(|_| rng.random_range(0..=100)).collect()
     }
     
-    /// Variante bonus : génère une HashMap associant une touche à un objectif.
+    /// Génère une `HashMap` associant une touche à un objectif.
+    ///
+    /// Chaque clé est une lettre aléatoire et la valeur correspondante est un objectif aléatoire entre 0 et 100.
+    ///
+    /// # Arguments
+    ///
+    /// * `n` - Le nombre d'associations à générer.
+    ///
+    /// # Retour
+    ///
+    /// Retourne une `HashMap<char, u32>` contenant les associations générées.
+    ///
+    /// # Remarque
+    ///
+    /// Le nombre d'éléments dans la map peut être inférieur à `n` si des clés se chevauchent.
     pub fn generate_map(n: usize) -> HashMap<char, u32> {
         let mut rng = rand::rng();
         // Liste de lettres pouvant être utilisées comme clés.
@@ -30,6 +68,7 @@ impl Objectives {
 mod tests {
     use super::*;
 
+    /// Vérifie que la génération d'un vecteur d'objectifs fonctionne correctement.
     #[test]
     fn test_generate_objectives() {
         let objs = Objectives::generate(5);
@@ -39,6 +78,7 @@ mod tests {
         }
     }
     
+    /// Vérifie que la génération d'une map d'objectifs fonctionne correctement.
     #[test]
     fn test_generate_map() {
         let map = Objectives::generate_map(5);

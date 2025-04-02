@@ -1,3 +1,8 @@
+//! Module gérant un compteur utilisé pour simuler une incrémentation avec un thread.
+//!
+//! Ce module définit la structure [`Counter`] et ses méthodes associées. Le compteur s'incrémente à une
+//! vitesse donnée et, lors de son exécution, affiche son état en continu jusqu'à ce que l'utilisateur appuie sur ENTREE.
+
 use std::io::{self, stdout, Write};
 use std::sync::mpsc;
 use std::thread;
@@ -10,7 +15,19 @@ pub struct Counter {
 }
 
 impl Counter {
-    /// Crée un nouveau compteur à partir de la vitesse (qui conditionnera l'incrémentation).
+    /// Crée un nouveau compteur à partir de la vitesse spécifiée.
+    ///
+    /// # Arguments
+    ///
+    /// * `speed` - La vitesse d'incrémentation (en millisecondes).
+    ///
+    /// # Exemples
+    ///
+    /// ```
+    /// use dual_game::counter::Counter;
+    ///
+    /// let counter = Counter::new(50);
+    /// ```
     pub fn new(speed: u32) -> Self {
         Counter { speed }
     }
@@ -20,14 +37,18 @@ impl Counter {
     /// La logique est la suivante :
     /// - Le compteur s'incrémente toutes les `speed` millisecondes.
     /// - Lorsque le compteur atteint 100, il se réinitialise et le nombre de "miss" est incrémenté.
-    /// - En continu, l'état du compteur est affiché, indiquant l'objectif à atteindre, le nombre de "miss" et la valeur actuelle du compteur.
+    /// - En continu, l'état du compteur est affiché, indiquant l'objectif, le nombre de "miss" et la valeur actuelle.
     /// - L'exécution du compteur se termine dès que l'utilisateur appuie sur ENTREE.
     ///
-    /// # Paramètres
-    /// * `objectif` - La valeur cible qui permet d'établir la différence lors du calcul du score.
+    /// # Arguments
+    ///
+    /// * `objectif` - La valeur cible utilisée pour le calcul du score.
     ///
     /// # Retour
-    /// * `(counter_value, miss)` - La valeur finale du compteur et le nombre de fois où le compteur a atteint zéro.
+    ///
+    /// Retourne un tuple `(counter_value, miss)` où :
+    /// - `counter_value` représente la valeur finale du compteur.
+    /// - `miss` correspond au nombre de fois où le compteur a atteint zéro.
     pub fn run(&self, objectif: u32) -> (u32, u32) {
         let (tx, rx) = mpsc::channel();
         let speed = self.speed;
@@ -37,7 +58,7 @@ impl Counter {
             let mut counter: u32 = 0;
             let mut miss: u32 = 0;
             loop {
-                // Terminer la boucle dès que le signal de l'arrêt est reçu.
+                // Terminer la boucle dès que le signal d'arrêt est reçu.
                 if rx.try_recv().is_ok() {
                     return (counter, miss);
                 }
@@ -71,18 +92,21 @@ impl Counter {
 mod tests {
     use super::*;
 
+    /// Vérifie que la création d'un compteur avec une vitesse donnée fonctionne correctement.
     #[test]
     fn test_counter_new() {
         let counter = Counter::new(50);
         assert_eq!(counter.speed, 50);
     }
 
-    // Ce test se contente de vérifier l'initialisation,
-    // car tester `run()` nécessiterait de simuler une entrée standard.
+    /// Test de simulation du compteur.
+    ///
+    /// Ce test vérifie simplement l'initialisation et une exécution minimale, car tester la méthode `run`
+    /// nécessiterait de simuler une entrée standard.
     #[test]
     fn test_counter_simulate() {
         let counter = Counter::new(50);
-        let (value, miss) = counter.run(50); // Provide a valid objectif value
+        let (value, miss) = counter.run(50); // Utilisation d'une valeur d'objectif valide
         assert!(value <= 100);
         assert!(miss <= 1);
     }

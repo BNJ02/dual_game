@@ -1,3 +1,8 @@
+//! Point d'entrée de l'application.
+//!
+//! Ce module configure et lance la boucle principale du jeu en analysant les arguments en ligne de commande
+//! et en créant les joueurs et la partie de jeu correspondante.
+
 use std::error::Error;
 use std::io::{stdin, stdout, Write};
 
@@ -6,6 +11,12 @@ use dual_game::game::Game;
 use dual_game::player::Player;
 
 /// Structure gérant les arguments en ligne de commande.
+///
+/// Les paramètres suivants sont disponibles :
+/// - `--name1` : Nom du premier joueur.
+/// - `--name2` : Nom du deuxième joueur.
+/// - `--vitality` : Vitalité initiale des joueurs (défaut: 50).
+/// - `--objectifs` : Nombre d’objectifs par tour (défaut: 5).
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -23,7 +34,10 @@ struct Args {
     objectifs: usize,
 }
 
-/// Point d’entrée de l’application.
+/// Fonction principale de l'application.
+///
+/// Initialise le logger, parse les arguments, crée les joueurs et lance une boucle de parties.
+/// L'utilisateur peut choisir de relancer une partie ou de quitter l'application.
 fn main() -> Result<(), Box<dyn Error>> {
     // Initialisation du logger (log, env_logger)
     env_logger::init();
@@ -31,7 +45,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Parse des arguments en ligne de commande.
     let args = Args::parse();
 
-    // Création des joueurs. Par défaut, on attribue 50 à la vitalité, à la vitesse et à la force.
+    // Création des joueurs avec les paramètres fournis.
     let player1 = Player::new(args.name1, args.vitality, 50, 50);
     let player2 = Player::new(args.name2, args.vitality, 50, 50);
 

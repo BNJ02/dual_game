@@ -1,9 +1,16 @@
+//! Module gérant l'application des effets de poison sur les joueurs.
+//!
+//! Ce module définit l'énumération [`PoisonType`] qui énumère les différents types de poison,
+//! ainsi qu'une fonction pour appliquer l'effet correspondant sur un joueur.
+
 use crate::player::Player;
 
 /// Énumération des types de poison pouvant être appliqués.
 #[derive(Clone, Debug)]
 pub enum PoisonType {
+    /// Poison affectant la vitesse.
     Speed,
+    /// Poison affectant la force.
     Strength,
 }
 
@@ -11,10 +18,12 @@ pub enum PoisonType {
 /// Le poison modifie soit la vitesse, soit la force du joueur.
 ///
 /// # Arguments
+///
 /// * `target` - Le joueur cible sur lequel appliquer le poison.
 /// * `poison_type` - Le type de poison à appliquer.
 ///
 /// # Retour
+///
 /// * `Ok(())` si l’opération s’est déroulée correctement.
 /// * `Err(String)` dans le cas d’une erreur (rare dans cette implémentation simple).
 pub fn apply_poison(target: &mut Player, poison_type: PoisonType) -> Result<(), String> {
