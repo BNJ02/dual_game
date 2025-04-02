@@ -58,8 +58,7 @@ impl ScoringCalculator {
     /// Retourne la moyenne arrondie à l'entier supérieur.
     pub fn calculate_average(scores: &[u32]) -> u32 {
         let sum: u32 = scores.iter().sum();
-        let avg = (sum as f64 / scores.len() as f64).ceil() as u32;
-        avg
+        (sum as f64 / scores.len() as f64).ceil() as u32
     }
 
     /// Calcule la différence entre l'objectif et la valeur du compteur en tenant compte du wrap-around entre 0 et 100.

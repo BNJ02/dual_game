@@ -46,8 +46,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
 
     // Création des joueurs avec les paramètres fournis.
-    let player1 = Player::new(args.name1, args.vitality, 50, 50);
-    let player2 = Player::new(args.name2, args.vitality, 50, 50);
+    let player1 = Player::new(args.name1, args.vitality, 100, 50);
+    let player2 = Player::new(args.name2, args.vitality, 100, 50);
 
     // Boucle principale pour jouer plusieurs parties.
     loop {

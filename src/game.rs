@@ -205,17 +205,17 @@ impl Game {
     /// - `scores_détaillés` est un vecteur contenant les scores de chaque objectif.
     pub fn play_turn(
         &self,
-        objectives: &Vec<u32>,
+        objectives: &[u32],
         player: &Player,
     ) -> Result<(u32, Vec<u32>), Box<dyn Error>> {
         let mut scores = Vec::new();
 
         // Pour chaque objectif, on simule l'arrêt d'un compteur.
-        for (_i, obj) in objectives.iter().enumerate() {
+        for obj in objectives.iter() {
             // Instanciation d'un compteur utilisant la vitesse du joueur.
             let counter = Counter::new(player.speed);
             // Simulation du comportement du compteur.
-            let (counter_value, miss) = counter.run(obj.clone());
+            let (counter_value, miss) = counter.run(*obj);
 
             let score =
                 ScoringCalculator::calculate_score(*obj, counter_value, miss, player.strength);
