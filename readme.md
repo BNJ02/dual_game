@@ -251,7 +251,9 @@ Relancer une partie ? [Y/N]
 ## Crédits
 
 **Auteurs** : Benjamin LEPOURTOIS, Jean-Baptiste DE BEAUREPAIRE et Paul PROCACCIA
+
 **Professeur en langage de programmation RUST à l'École Centrale de Nantes** : Corentin GAUTHIER
+
 **Date** : mars 2025  
 
 Ce projet a été réalisé dans le cadre d'un exercice de programmation en Rust, visant à appliquer les principes de développement sécurisé, de test unitaire et de respect des bonnes pratiques du langage.
