@@ -67,7 +67,8 @@ impl Counter {
                 stdout().flush().unwrap();
 
                 // Mise à jour du compteur.
-                counter = (counter + 1) % 100;
+                counter = (counter + 1) % 101; // Réinitialisation à 0 si le compteur atteint 100.
+                // Incrémentation du nombre de "miss" si le compteur est à 0.
                 if counter == 0 {
                     miss += 1;
                 }

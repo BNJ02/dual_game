@@ -43,18 +43,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     env_logger::init();
 
     // Parse des arguments en ligne de commande.
-    let args = Args::parse();
+    let args: Args = Args::parse();
 
     // Création des joueurs avec les paramètres fournis.
-    let player1 = Player::new(args.name1, args.vitality, 100, 50);
-    let player2 = Player::new(args.name2, args.vitality, 100, 50);
+    let player1 = Player::new(args.name1, args.vitality, 50, 50);
+    let player2 = Player::new(args.name2, args.vitality, 50, 50);
 
     // Boucle principale pour jouer plusieurs parties.
     loop {
         let mut game = Game::new(vec![player1.clone(), player2.clone()], args.objectifs);
         game.run()?;
 
-        println!("Relancer une partie ? [Y/N]");
+        println!("\n🔄 Relancer une partie ? [Y/N]");
         loop {
             print!("> ");
             stdout().flush()?;

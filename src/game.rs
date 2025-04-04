@@ -124,30 +124,45 @@ impl Game {
             self.players[loser_index].vitality =
                 self.players[loser_index].vitality.saturating_sub(diff);
 
-            // Le joueur gagnant choisit quel poison appliquer.
-            println!(
-                "{} vous devez choisir quel poison appliquer à {} :",
-                self.players[winner_index].name, self.players[loser_index].name
-            );
-            println!("→ 1: -5 speed");
-            println!("→ 2: -5 strength");
-            let poison_choice = self.get_choice()?;
-            let poison_type = match poison_choice {
-                1 => PoisonType::Speed,
-                2 => PoisonType::Strength,
-                _ => {
-                    println!("Choix invalide, aucun poison appliqué.");
-                    self.round += 1;
-                    continue;
-                }
-            };
+            // Ne pas demander le poison si le perdant n'a plus de vitalité.
+            if self.players[loser_index].vitality > 0 {
+                println!(
+                    "{} vous devez choisir quel poison appliquer à {} :",
+                    self.players[winner_index].name, self.players[loser_index].name
+                );
+                println!("→ 1: -5 speed");
+                println!("→ 2: -5 strength");
+                let poison_choice = self.get_choice()?;
+                let poison_type = match poison_choice {
+                    1 => PoisonType::Speed,
+                    2 => PoisonType::Strength,
+                    _ => {
+                        println!("Choix invalide, aucun poison appliqué.");
+                        self.round += 1;
+                        continue;
+                    }
+                };
 
-            apply_poison(&mut self.players[loser_index], poison_type)?;
+                apply_poison(&mut self.players[loser_index], poison_type)?;
+            }
+
             println!("## FIN Manche {} ##", self.round);
             self.round += 1;
         }
 
+        // Affichage du vainqueur et des statistiques.
         println!("\n##### Partie terminée #####");
+        if let Some(winner) = self.players.iter().max_by_key(|p| p.vitality) {
+            println!("Le vainqueur est {} !", winner.name);
+        }
+        println!("\nStatistiques des joueurs :");
+        for player in &self.players {
+            println!(
+                "{} - Vitality: {}, Speed: {}, Strength: {}",
+                player.name, player.vitality, player.speed, player.strength
+            );
+        }
+
         Ok(())
     }
 
